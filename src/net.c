@@ -178,6 +178,10 @@ net_recv_reset(struct connection *c, size_t len, int (*cb)(struct netbuf *), siz
 	c->rnb->s_off = 0;
 	c->rnb->b_len = len;
 
+	if (c->rnb->m_len == len) {
+		return;
+	}
+
 	if (c->rnb->buf != NULL && c->rnb->b_len <= c->rnb->m_len &&
 		c->rnb->m_len < (max / 2))
 		return;
