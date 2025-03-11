@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <ctype.h>
 #include <limits.h>
 #include <fcntl.h>
 #include <pwd.h>
@@ -116,6 +115,7 @@ static int		configure_route_on_free(char *);
 static int		configure_route_on_headers(char *);
 static int		configure_route_authenticate(char *);
 static int		configure_route_on_body_chunk(char *);
+static int		configure_http_body_buf_len(char *);
 static int		configure_filemap(char *);
 static int		configure_return(char *);
 static int		configure_redirect(char *);
@@ -181,17 +181,17 @@ static struct {
 #endif
 	{ "bind",			configure_bind },
 	{ "load",			configure_load },
-	{ "domain",			configure_domain },
-	{ "privsep",			configure_privsep },
-	{ "server",			configure_server },
-	{ "attach",			configure_attach },
-	{ "certkey",			configure_certkey },
-	{ "certfile",			configure_certfile },
-	{ "include",			configure_include },
+	{ "domain",		configure_domain },
+	{ "privsep",		configure_privsep },
+	{ "server",		configure_server },
+	{ "attach",		configure_attach },
+	{ "certkey",		configure_certkey },
+	{ "certfile",		configure_certfile },
+	{ "include",		configure_include },
 	{ "unix",			configure_bind_unix },
 	{ "skip",			configure_privsep_skip },
 	{ "root",			configure_privsep_root },
-	{ "runas",			configure_privsep_runas },
+	{ "runas",		configure_privsep_runas },
 	{ "client_verify",		configure_client_verify },
 	{ "client_verify_depth",	configure_client_verify_depth },
 #if defined(KORE_USE_PYTHON)
@@ -201,8 +201,8 @@ static struct {
 #if !defined(KORE_NO_HTTP)
 	{ "route",			configure_route },
 	{ "handler",			configure_route_handler },
-	{ "on_headers",			configure_route_on_headers },
-	{ "on_body_chunk",		configure_route_on_body_chunk },
+	{ "on_headers",		configure_route_on_headers },
+	{ "on_body_chunk",	configure_route_on_body_chunk },
 	{ "on_free",			configure_route_on_free },
 	{ "methods",			configure_route_methods },
 	{ "authenticate",		configure_route_authenticate },
@@ -258,17 +258,18 @@ static struct {
 	{ "http_header_max",		configure_http_header_max },
 	{ "http_header_timeout",	configure_http_header_timeout },
 	{ "http_body_max",		configure_http_body_max },
-	{ "http_body_timeout",		configure_http_body_timeout },
+	{"http_body_buf_len",		configure_http_body_buf_len},
+	{ "http_body_timeout",	configure_http_body_timeout },
 	{ "http_hsts_enable",		configure_http_hsts_enable },
 	{ "http_keepalive_time",	configure_http_keepalive_time },
 	{ "http_request_ms",		configure_http_request_ms },
-	{ "http_request_limit",		configure_http_request_limit },
+	{ "http_request_limit",	configure_http_request_limit },
 	{ "http_body_disk_offload",	configure_http_body_disk_offload },
 	{ "http_body_disk_path",	configure_http_body_disk_path },
 	{ "http_server_version",	configure_http_server_version },
-	{ "http_pretty_error",		configure_http_pretty_error },
-	{ "websocket_maxframe",		configure_websocket_maxframe },
-	{ "websocket_timeout",		configure_websocket_timeout },
+	{ "http_pretty_error",	configure_http_pretty_error },
+	{ "websocket_maxframe",	configure_websocket_maxframe },
+	{ "websocket_timeout",	configure_websocket_timeout },
 #endif
 #if defined(KORE_USE_PGSQL)
 	{ "pgsql_conn_max",		configure_pgsql_conn_max },
@@ -715,6 +716,27 @@ configure_bind(char *options)
 		return (KORE_RESULT_ERROR);
 
 	return (kore_server_bind(current_server, argv[0], argv[1], argv[2]));
+}
+
+static int
+configure_http_body_buf_len(char *options)
+{
+
+	if (options == NULL) {
+		kore_log(LOG_ERR, "a value must be provided to configure_http_body_buf_len");
+		return (KORE_RESULT_ERROR);
+	}
+
+	int err;
+	int buf_len = (int) kore_strtonum(options, 10, 1, 128 * 1024 * 1024, &err);
+	if (err != KORE_RESULT_OK) {
+		kore_log(LOG_ERR, "the value provided to configure_http_body_buf_len was either invalid or outside the allowed range of 1 to 134217728 bytes");
+		return (KORE_RESULT_OK);
+	}
+
+	http_body_buf_len = buf_len;
+
+	return (KORE_RESULT_OK);
 }
 
 static int

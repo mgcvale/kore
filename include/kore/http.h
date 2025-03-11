@@ -35,6 +35,7 @@ extern "C" {
 #define HTTP_HSTS_ENABLE	31536000
 #define HTTP_HEADER_MAX_LEN	4096
 #define HTTP_BODY_MAX_LEN	1024000
+#define HTTP_BODY_BUF_LEN	8192
 #define HTTP_URI_LEN		2000
 #define HTTP_USERAGENT_LEN	256
 #define HTTP_REFERER_LEN	256
@@ -344,6 +345,7 @@ struct http_media_type {
 extern size_t		http_body_max;
 extern u_int16_t	http_body_timeout;
 extern u_int16_t	http_header_max;
+extern u_int32_t	http_body_buf_len;
 extern u_int16_t	http_header_timeout;
 extern u_int32_t	http_request_ms;
 extern u_int64_t	http_hsts_enable;

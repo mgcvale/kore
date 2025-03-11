@@ -167,15 +167,17 @@ static struct kore_pool			http_rlq_pool;
 
 struct kore_pool			http_header_pool;
 
-int		http_pretty_error = 0;
+int			http_pretty_error = 0;
 u_int32_t	http_request_count = 0;
 u_int32_t	http_request_ms = HTTP_REQUEST_MS;
 u_int16_t	http_body_timeout = HTTP_BODY_TIMEOUT;
 u_int32_t	http_request_limit = HTTP_REQUEST_LIMIT;
 u_int64_t	http_hsts_enable = HTTP_HSTS_ENABLE;
 u_int16_t	http_header_max = HTTP_HEADER_MAX_LEN;
+u_int32_t	http_body_buf_len = HTTP_BODY_BUF_LEN;
 u_int16_t	http_keepalive_time = HTTP_KEEPALIVE_TIME;
 u_int16_t	http_header_timeout = HTTP_HEADER_TIMEOUT;
+
 
 size_t		http_body_max = HTTP_BODY_MAX_LEN;
 char		*http_body_disk_path = HTTP_BODY_DISK_PATH;
