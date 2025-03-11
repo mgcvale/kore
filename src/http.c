@@ -1475,7 +1475,7 @@ http_start_recv(struct connection *c)
 {
 	c->http_start = kore_time_ms();
 	c->http_timeout = http_header_timeout * 1000;
-	net_recv_reset(c, http_header_max, http_header_recv);
+	net_recv_reset(c, http_body_buf_len, http_header_recv, http_body_buf_len);
 }
 
 void
@@ -2385,8 +2385,8 @@ http_body_update(struct http_request *req, const void *data, size_t len)
 	} else {
 		bytes_left = req->content_length;
 		net_recv_reset(req->owner,
-		    MIN(bytes_left, NETBUF_SEND_PAYLOAD_MAX),
-		    http_body_recv);
+		    MIN(bytes_left, http_body_buf_len),
+		    http_body_recv, http_body_buf_len);
 		req->owner->rnb->extra = req;
 	}
 

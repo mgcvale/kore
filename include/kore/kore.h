@@ -1069,6 +1069,8 @@ struct kore_validator	*kore_validator_lookup(const char *);
 const char	*kore_worker_name(int);
 
 /* net.c */
+
+extern u_int32_t netbuf_send_payload_max;
 u_int16_t	net_read16(u_int8_t *);
 u_int32_t	net_read32(u_int8_t *);
 u_int64_t	net_read64(u_int8_t *);
@@ -1085,7 +1087,7 @@ int		net_recv_flush(struct connection *);
 int		net_read(struct connection *, size_t *);
 int		net_write(struct connection *, size_t, size_t *);
 void		net_recv_reset(struct connection *, size_t,
-		    int (*cb)(struct netbuf *));
+		    int (*cb)(struct netbuf *), size_t max);
 void		net_remove_netbuf(struct connection *, struct netbuf *);
 void		net_recv_queue(struct connection *, size_t, int,
 		    int (*cb)(struct netbuf *));
