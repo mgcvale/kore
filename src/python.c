@@ -2,9 +2,6 @@
  * Copyright (c) 2016 Stanislav Yudin <stan@endlessinsomnia.com>
  * Copyright (c) 2017-2022 Joris Vink <joris@coders.se>
  *
- * Modified by mgcvale <miguelcvalealt@gmail.com>, 2025
- * Copyright (c) 2025 Miguel Cyrineu
- *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
@@ -196,7 +193,7 @@ static int	python_validator_check(PyObject *);
 static int	python_runtime_resolve(const char *, const struct stat *);
 static int	python_runtime_http_request(void *, struct http_request *);
 static void	python_runtime_http_request_free(void *, struct http_request *);
-static int  python_runtime_http_body_chunk(void *, struct http_request *,
+static int	python_runtime_http_body_chunk(void *, struct http_request *,
 		    const void *, size_t);
 static int	python_runtime_validator(void *, struct http_request *,
 		    const void *);
@@ -1477,6 +1474,7 @@ static int
 python_runtime_http_body_chunk(void *addr, struct http_request *req,
     const void *data, size_t len)
 {
+	int		result;
 	PyObject	*args, *ret;
 
 	if (req->py_req == NULL) {
@@ -1492,13 +1490,18 @@ python_runtime_http_body_chunk(void *addr, struct http_request *req,
 	PyErr_Clear();
 	ret = PyObject_Call(addr, args, NULL);
 
-	if (ret == NULL) 
+	if (ret == NULL)
 		kore_python_log_error("python_runtime_http_body_chunk");
+
+	if (ret == Py_True)
+		result = KORE_RESULT_OK;
+	else
+		result = KORE_RESULT_ERROR;
 
 	Py_XDECREF(ret);
 	Py_DECREF(args);
 
-    return (KORE_RESULT_OK);
+	return (result);
 }
 
 static int
