@@ -216,15 +216,6 @@ net_recv_expand(struct connection *c, size_t len, int (*cb)(struct netbuf *))
 	c->rnb->b_len += len;
 	c->rnb->m_len = c->rnb->b_len;
 	c->rnb->buf = kore_realloc(c->rnb->buf, c->rnb->b_len);
-
-
-	if (c->rnb->buf != NULL && c->rnb->b_len <= c->rnb->m_len &&
-		c->rnb->m_len < (NETBUF_SEND_PAYLOAD_MAX / 2))
-		return;
-
-	kore_free(c->rnb->buf);
-	c->rnb->m_len = len;
-	c->rnb->buf = kore_malloc(c->rnb->m_len);
 }
 
 int
