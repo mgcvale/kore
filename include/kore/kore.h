@@ -21,6 +21,15 @@
 #define daemon portability_is_king
 #endif
 
+/*
+ * Extremely ugly hack to get past glibc 2.43 its insane implementation
+ * of C23 features shoved down a C99 code base.
+ */
+#if defined(__GLIBC__)
+#undef __GLIBC_USE_ISOC23
+#include <string.h>
+#endif
+
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -36,8 +45,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <signal.h>
 #include <string.h>
+#include <signal.h>
 #include <syslog.h>
 #include <unistd.h>
 #include <stdarg.h>
@@ -472,7 +481,8 @@ struct kore_worker {
 	pid_t				pid;
 	int				pipe[2];
 	struct connection		*msg[2];
-	u_int8_t			has_lock;
+	int				has_lock;
+	int				no_accept;
 	int				restarted;
 	u_int64_t			time_locked;
 	struct kore_route		*active_route;
@@ -774,8 +784,9 @@ void		kore_worker_reap(void);
 int		kore_worker_init(void);
 void		kore_worker_privsep(void);
 void		kore_worker_started(void);
-void		kore_worker_make_busy(void);
 void		kore_worker_shutdown(void);
+void		kore_worker_make_busy(void);
+void		kore_worker_no_accept(u_int8_t);
 void		kore_worker_dispatch_signal(int);
 int		kore_worker_spawn(u_int16_t, u_int16_t, u_int16_t);
 int		kore_worker_keymgr_response_verify(struct kore_msg *,
