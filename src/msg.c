@@ -256,7 +256,8 @@ msg_recv_data(struct netbuf *nb)
 		}
 	}
 
-	net_recv_reset(nb->owner, sizeof(struct kore_msg), msg_recv_packet);
+	net_recv_reset(nb->owner, sizeof(struct kore_msg), msg_recv_packet,
+	    sizeof(struct kore_msg));
 	return (KORE_RESULT_OK);
 }
 

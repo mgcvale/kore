@@ -94,7 +94,8 @@ kore_websocket_handshake(struct http_request *req, const char *onconnect,
 
 	req->owner->proto = CONN_PROTO_WEBSOCKET;
 	http_response(req, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, 0);
-	net_recv_reset(req->owner, WEBSOCKET_FRAME_HDR, websocket_recv_opcode);
+	net_recv_reset(req->owner, WEBSOCKET_FRAME_HDR, websocket_recv_opcode,
+	    WEBSOCKET_FRAME_HDR);
 
 	req->owner->disconnect = websocket_disconnect;
 	req->owner->rnb->flags &= ~NETBUF_CALL_CB_ALWAYS;
@@ -346,7 +347,8 @@ websocket_recv_frame(struct netbuf *nb)
 		return (KORE_RESULT_ERROR);
 	}
 
-	net_recv_reset(c, WEBSOCKET_FRAME_HDR, websocket_recv_opcode);
+	net_recv_reset(c, WEBSOCKET_FRAME_HDR, websocket_recv_opcode,
+	    WEBSOCKET_FRAME_HDR);
 
 	return (ret);
 }
