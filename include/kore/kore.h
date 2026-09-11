@@ -135,6 +135,7 @@ typedef void		KORE_PRIVATE_KEY;
 
 /* XXX hackish. */
 #if !defined(KORE_NO_HTTP)
+struct http_header;
 struct http_request;
 struct http_redirect;
 #endif
@@ -366,6 +367,7 @@ struct kore_domain {
 	int					x509_verify_depth;
 #if !defined(KORE_NO_HTTP)
 	TAILQ_HEAD(, kore_route)		routes;
+	TAILQ_HEAD(, http_header)		headers;
 	TAILQ_HEAD(, http_redirect)		redirects;
 #endif
 	TAILQ_ENTRY(kore_domain)		list;
